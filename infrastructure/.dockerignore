@@ -1,0 +1,37 @@
+# Frontend
+frontend/node_modules
+frontend/.next
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/coverage
+frontend/.git
+
+# Backend
+backend/__pycache__
+backend/.pyc
+backend/.pyd
+backend/.pyo
+backend/.egg-info
+backend/dist
+backend/build
+backend/.python-version
+backend/.env
+backend/*.pyc
+backend/__pycache__/
+backend/.pytest_cache
+backend/.coverage
+backend/htmlcov
+
+# Node Backend
+node-backend/node_modules
+node-backend/dist
+node-backend/.env
+node-backend/coverage
+
+# General
+.git
+.gitignore
+*.md
+.DS_Store
+docker-compose*.yml
