@@ -7,8 +7,6 @@ import {
   Bell,
   Key,
   CreditCard,
-  Shield,
-  Globe,
   Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,11 +15,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useAuth } from "@/hooks/use-auth";
 
 function SettingsPage() {
+  const { user } = useAuth();
   const [profile, setProfile] = React.useState({
-    name: "John Doe",
-    email: "john@example.com",
+    name: user?.name || "User",
+    email: user?.email || "",
     bio: "Full-stack developer and AI enthusiast",
   });
 

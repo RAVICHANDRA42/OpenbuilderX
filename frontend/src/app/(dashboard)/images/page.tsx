@@ -3,7 +3,9 @@
 import * as React from "react";
 import { ImageGenerator } from "@/components/images/image-generator";
 import { ImageGallery } from "@/components/images/image-gallery";
+import { post } from "@/lib/api-client";
 import { generateId } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface GeneratedImage {
   id: string;
@@ -27,25 +29,30 @@ function ImagesPage() {
     setIsLoading(true);
     const [width, height] = params.size.split("x").map(Number);
 
-    setTimeout(() => {
-      const newImages: GeneratedImage[] = Array.from(
-        { length: params.count },
-        (_, i) => ({
-          id: generateId(),
-          url: `/api/placeholder/${width}/${height}?text=Generated+Image+${i + 1}`,
-          prompt: params.prompt,
-          width,
-          height,
-          createdAt: new Date().toISOString(),
-        })
+    try {
+      const data = await post<{ id: string; url: string; prompt: string; style: string; size: string; created_at: string }>(
+        "/images/generate",
+        { prompt: params.prompt, style: params.style, size: params.size }
       );
-      setImages((prev) => [...newImages, ...prev]);
-      setIsLoading(false);
-    }, 2000);
+      const newImage: GeneratedImage = {
+        id: data.id || generateId(),
+        url: data.url || "",
+        prompt: data.prompt || params.prompt,
+        width,
+        height,
+        createdAt: data.created_at || new Date().toISOString(),
+      };
+      setImages((prev) => [newImage, ...prev]);
+      toast.success("Image generated successfully!");
+    } catch {
+      toast.error("Image generation failed. The model may still be loading on first run.");
+    }
+    setIsLoading(false);
   };
 
   const handleDownload = (id: string) => {
-    console.log("Download image:", id);
+    const img = images.find((i) => i.id === id);
+    if (img?.url) window.open(img.url, "_blank");
   };
 
   const handleDelete = (id: string) => {

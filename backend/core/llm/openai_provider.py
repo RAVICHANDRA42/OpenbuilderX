@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 from openai import AsyncOpenAI
 
@@ -10,8 +10,11 @@ from core.llm.base import BaseLLMProvider
 
 class OpenAIProvider(BaseLLMProvider):
     def __init__(self) -> None:
-        self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-        self.model = "gpt-4-turbo-preview"
+        self.client = AsyncOpenAI(
+            api_key=settings.OPENAI_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+        )
+        self.model = "openai/gpt-4o-mini"
 
     async def generate(
         self,

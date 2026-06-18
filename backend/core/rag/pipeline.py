@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, List, Optional
+from typing import Any
 
-from core.config import settings
 
 logger = logging.getLogger(__name__)
 

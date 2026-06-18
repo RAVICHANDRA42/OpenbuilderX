@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import hashlib
 import logging
-import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -76,3 +74,17 @@ async def get_current_user(
 
 async def require_auth(user_id: str = Depends(get_current_user)) -> str:
     return user_id
+
+
+async def get_optional_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> Optional[str]:
+    if credentials is None:
+        return None
+    try:
+        payload = decode_token(credentials.credentials)
+        if payload.get("type") == "access":
+            return payload["sub"]
+    except Exception:
+        pass
+    return None

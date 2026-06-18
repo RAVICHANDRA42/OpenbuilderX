@@ -44,8 +44,8 @@ class CodeService:
 
     async def explain_code(self, code: str, language: str = "python") -> dict[str, Any]:
         result = await self._get_provider().generate(
-            system_prompt="You are a code explainer. Be clear and thorough.",
-            prompt=f"Explain this {language} code:\n\n{code}",
+            system_prompt="You are a code interpreter. Given code, return ONLY the exact output that would be printed to the console when the code runs. Do not include any explanations, labels, or formatting.",
+            prompt=f"What is the output of this {language} code?\n\n{code}",
         )
         return {"explanation": result, "language": language}
 

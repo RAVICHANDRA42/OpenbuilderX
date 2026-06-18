@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { post } from "@/lib/api-client";
+import { post, get } from "@/lib/api-client";
 
 function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, setToken } = useAuth();
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -39,7 +39,15 @@ function LoginPage() {
       console.log("Sending login request...");
       const res = await post<{ access_token: string; refresh_token: string; token_type: string }>("/auth/login", { email, password });
       console.log("Login response received", res);
-      login({ id: email, email, name: email.split("@")[0], subscriptionTier: "free", createdAt: new Date().toISOString() }, res.access_token);
+      setToken(res.access_token);
+      let userName = email.split("@")[0];
+      try {
+        const me = await get<{ name: string; email: string }>("/auth/me");
+        userName = me.name;
+      } catch {
+        console.log("Could not fetch user profile, using email prefix as name");
+      }
+      login({ id: email, email, name: userName, subscriptionTier: "free", createdAt: new Date().toISOString() }, res.access_token);
       router.push("/chat");
     } catch (err: unknown) {
       console.error("Login error:", err);

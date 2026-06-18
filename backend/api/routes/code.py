@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from api.middleware.auth import require_auth
+from api.services.code_service import code_service
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +36,20 @@ async def generate_code(
     user_id: str = Depends(require_auth),
 ) -> dict[str, Any]:
     logger.info("Code generation requested by %s", user_id)
-    return {
-        "code": f"# Generated {body.language} code for: {body.prompt}\n# TODO: implement",
-        "language": body.language,
-        "explanation": "This is a placeholder response.",
-    }
+    try:
+        result = await code_service.generate_code(body.prompt, body.language)
+        return {
+            "code": result["generated_code"],
+            "language": body.language,
+            "explanation": f"Generated {body.language} code for: {body.prompt}",
+        }
+    except Exception as e:
+        logger.error("Code generation failed: %s", e)
+        return {
+            "code": f"# Error generating code: {str(e)[:200]}",
+            "language": body.language,
+            "explanation": "Code generation failed.",
+        }
 
 
 @router.post("/debug")
@@ -48,11 +58,20 @@ async def debug_code(
     user_id: str = Depends(require_auth),
 ) -> dict[str, Any]:
     logger.info("Code debug requested by %s", user_id)
-    return {
-        "bugs": ["Placeholder: no bugs detected"],
-        "fixed_code": body.code,
-        "explanations": ["This is a placeholder response."],
-    }
+    try:
+        result = await code_service.debug_code(body.code, body.language)
+        return {
+            "bugs": [],
+            "fixed_code": result["fixed_code"],
+            "explanations": ["Code has been reviewed and fixed."],
+        }
+    except Exception as e:
+        logger.error("Code debug failed: %s", e)
+        return {
+            "bugs": [f"Debug failed: {str(e)[:200]}"],
+            "fixed_code": body.code,
+            "explanations": ["Debug service unavailable."],
+        }
 
 
 @router.post("/explain")
@@ -61,11 +80,20 @@ async def explain_code(
     user_id: str = Depends(require_auth),
 ) -> dict[str, Any]:
     logger.info("Code explanation requested by %s", user_id)
-    return {
-        "explanation": f"Placeholder explanation for {body.language} code:\n{body.code[:100]}...",
-        "complexity": "O(n)",
-        "suggestions": ["Placeholder suggestion"],
-    }
+    try:
+        result = await code_service.explain_code(body.code, body.language)
+        return {
+            "explanation": result["explanation"],
+            "complexity": "N/A",
+            "suggestions": [],
+        }
+    except Exception as e:
+        logger.error("Code explanation failed: %s", e)
+        return {
+            "explanation": f"Could not explain the code. The AI service is currently unavailable. Details: {str(e)[:200]}",
+            "complexity": "N/A",
+            "suggestions": [],
+        }
 
 
 @router.post("/convert")
@@ -74,8 +102,17 @@ async def convert_code(
     user_id: str = Depends(require_auth),
 ) -> dict[str, Any]:
     logger.info("Code conversion requested by %s", user_id)
-    return {
-        "converted_code": f"// Converted from {body.source_language} to {body.target_language}\n// TODO: implement",
-        "source_language": body.source_language,
-        "target_language": body.target_language,
-    }
+    try:
+        result = await code_service.convert_code(body.code, body.source_language, body.target_language)
+        return {
+            "converted_code": result["converted_code"],
+            "source_language": body.source_language,
+            "target_language": body.target_language,
+        }
+    except Exception as e:
+        logger.error("Code conversion failed: %s", e)
+        return {
+            "converted_code": f"// Error converting code: {str(e)[:200]}",
+            "source_language": body.source_language,
+            "target_language": body.target_language,
+        }

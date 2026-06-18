@@ -16,13 +16,13 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  User,
   Zap,
   BarChart3,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
 
 const navLinks = [
   { href: "/chat", label: "Chat", icon: MessageSquare },
@@ -41,7 +41,12 @@ interface SidebarProps {
 
 function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "U";
 
   const isActive = (href: string) => {
     if (href === "/chat") return pathname === "/chat" || pathname === "/";
@@ -143,13 +148,13 @@ function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <div className={cn("flex items-center gap-3", collapsed && "flex-col")}>
           <Avatar className="h-8 w-8">
             <AvatarImage src="/avatars/default.png" alt="User" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">John Doe</p>
+              <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
               <p className="text-xs text-muted-foreground truncate">
-                Pro Plan
+                {user?.email || ""}
               </p>
             </div>
           )}

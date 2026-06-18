@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 
 class BaseLLMProvider(ABC):

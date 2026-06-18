@@ -13,22 +13,11 @@ import {
   Settings,
   Zap,
   LogOut,
-  CreditCard,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavbarProps {
   onMenuToggle?: () => void;
@@ -36,8 +25,14 @@ interface NavbarProps {
 
 function Navbar({ onMenuToggle }: NavbarProps) {
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
   const [mounted, setMounted] = React.useState(false);
   const [searchOpen, setSearchOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "U";
 
   React.useEffect(() => {
     setMounted(true);
@@ -103,51 +98,59 @@ function Navbar({ onMenuToggle }: NavbarProps) {
           </Button>
         )}
 
-        <div className="relative group">
-          <Button variant="ghost" size="icon" className="rounded-full">
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
+          >
             <Avatar className="h-8 w-8">
               <AvatarImage src="/avatars/default.png" alt="User" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Button>
 
-          <div className="absolute right-0 top-full mt-1 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-            <div className="rounded-md border bg-popover p-1 shadow-md">
-              <div className="px-2 py-1.5">
-                <p className="text-sm font-medium">John Doe</p>
-                <p className="text-xs text-muted-foreground">
-                  john@example.com
-                </p>
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-56 z-50">
+              <div className="rounded-md border bg-popover p-1 shadow-md">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user?.name || "User"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {user?.email || ""}
+                  </p>
+                </div>
+                <div className="h-px bg-border my-1" />
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors"
+                >
+                  <User className="h-4 w-4" />
+                  Profile
+                </Link>
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors"
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+                <Link
+                  href="/settings?tab=billing"
+                  className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors"
+                >
+                  <Zap className="h-4 w-4" />
+                  Upgrade to Pro
+                </Link>
+                <div className="h-px bg-border my-1" />
+                <button className="flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors text-destructive">
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </button>
               </div>
-              <div className="h-px bg-border my-1" />
-              <Link
-                href="/settings"
-                className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors"
-              >
-                <User className="h-4 w-4" />
-                Profile
-              </Link>
-              <Link
-                href="/settings"
-                className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                Settings
-              </Link>
-              <Link
-                href="/settings?tab=billing"
-                className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors"
-              >
-                <Zap className="h-4 w-4" />
-                Upgrade to Pro
-              </Link>
-              <div className="h-px bg-border my-1" />
-              <button className="flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent transition-colors text-destructive">
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </button>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

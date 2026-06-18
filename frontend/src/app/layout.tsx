@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ToastProvider } from "@/components/ui/toast";
+import { Toaster } from "react-hot-toast";
 import "@/styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -26,9 +26,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider>
+          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
             {children}
-          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -33,6 +32,8 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: str = "development"
     CORS_ORIGINS: List[str] = ["*"]
+
+    HOST_URL: str = "http://localhost:8000"
 
     UPLOAD_DIR: str = "uploads"
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024  # 50 MB
