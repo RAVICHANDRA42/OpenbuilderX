@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import List
+import json
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,12 +32,26 @@ class Settings(BaseSettings):
     AWS_REGION: str = "us-east-1"
 
     ENVIRONMENT: str = "development"
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: str = '["*"]'
 
     HOST_URL: str = "http://localhost:8000"
 
     UPLOAD_DIR: str = "uploads"
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024  # 50 MB
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: str) -> str:
+        if isinstance(v, str):
+            try:
+                json.loads(v)
+            except json.JSONDecodeError:
+                return json.dumps([o.strip() for o in v.split(",") if o.strip()])
+        return v
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return json.loads(self.CORS_ORIGINS)
 
     @property
     def is_production(self) -> bool:

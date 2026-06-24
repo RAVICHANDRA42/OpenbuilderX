@@ -12,7 +12,7 @@ from redis.asyncio import Redis
 
 from api.routes import auth, builder, chat, code, documents, images, knowledge, marketplace, users
 from core.config import settings
-from database import database, init_db, close_db
+from database import database, init_db, close_db, db as mongo_db
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS if not settings.is_production else settings.CORS_ORIGINS,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: openbuilder-backend
+    runtime: python
+    plan: standard
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    rootDir: backend
+
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PORT
+        value: 8000
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+      # Add these via Render dashboard:
+      # DATABASE_URL, REDIS_URL, MONGODB_URL, JWT_SECRET, API keys, etc.
+      # CORS_ORIGINS should be set to your Vercel frontend URL, e.g.:
+      # CORS_ORIGINS=["https://your-app.vercel.app"]
+
+    healthCheckPath: /health
+    healthCheckInterval: 30
+
+    startTimeout: 120
+    restartPolicy: always
+
+    minInstances: 1
+    maxInstances: 3
+
+    disk:
+      name: upload-storage
+      mountPath: /data/uploads
+      sizeGB: 10
+
+databases:
+  - name: postgres
+    plan: standard
+    ipAllowList: []
+
+  - name: redis
+    plan: standard
+    ipAllowList: []
